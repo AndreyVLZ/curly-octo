@@ -1,0 +1,14 @@
+# Binaries
+cmd/agent/agent
+cmd/server/server
+
+# VIM temp files
+*.swp
+*.swo
+
+# test cover
+coverage/
+
+# tmpDir
+tmpDir/
+
