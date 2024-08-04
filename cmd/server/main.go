@@ -7,7 +7,15 @@ import (
 	"github.com/AndreyVLZ/curly-octo/server"
 )
 
+var (
+	buildVersion = "N/A"
+	buildDate    = "N/A"
+	buildCommit  = "N/A"
+)
+
 func main() {
+	log.Printf("\nBuild version: %s\nBuild date: %s\nBuild commit: %s\n", buildVersion, buildDate, buildCommit)
+
 	addr := flag.String("a", server.AddresDefault, "адрес подключения")
 	tmpDir := flag.String("d", server.TmpDirDefault, "куда сохранять файла")
 	key := flag.String("k", "", "ключ")
@@ -17,7 +25,12 @@ func main() {
 
 	cfg := server.NewConfig(*addr, *tmpDir, *key, *exp, *bufSize)
 
-	server := server.New(cfg)
+	server, err := server.New(cfg)
+	if err != nil {
+		log.Printf("server init: %v\n", err)
+
+		return
+	}
 
 	if err := server.Start(); err != nil {
 		log.Printf("server start: %v\n", err)

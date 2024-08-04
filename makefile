@@ -1,6 +1,11 @@
 build: 
-	go build -o cmd/agent/agent cmd/agent/main.go
-	go build -o cmd/server/server cmd/server/main.go
+	go build \
+		-ldflags "-X main.buildVersion=$(shell git describe --tags) -X 'main.buildDate=$(shell date +'%Y/%m/%d %H:%M:%S')' -X 'main.buildCommit=$(shell git rev-parse HEAD)'" \
+		-o cmd/server/server cmd/server/main.go
+	go build \
+		-ldflags "-X main.buildVersion=$(shell git describe --tags) -X 'main.buildDate=$(shell date +'%Y/%m/%d %H:%M:%S')' -X 'main.buildCommit=$(shell git rev-parse HEAD)'" \
+		-o cmd/agent/agent cmd/agent/main.go
+	go build -o cmd/gencert/gencert cmd/gencert/main.go
 proto: 
 	protoc \
 		--go_out=. --go_opt=paths=source_relative \

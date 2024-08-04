@@ -8,7 +8,15 @@ import (
 	"github.com/AndreyVLZ/curly-octo/agent"
 )
 
+var (
+	buildVersion = "N/A"
+	buildDate    = "N/A"
+	buildCommit  = "N/A"
+)
+
 func main() {
+	log.Printf("\nBuild version: %s\nBuild date: %s\nBuild commit: %s\n", buildVersion, buildDate, buildCommit)
+
 	addr := flag.String("a", agent.AddresDefault, "адрес подключения")
 	tmpDir := flag.String("d", agent.TmpDirDefault, "куда сохранять файла")
 	secretKey := flag.String("k", "", "ключ")

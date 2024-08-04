@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net"
@@ -13,6 +14,7 @@ import (
 	"github.com/AndreyVLZ/curly-octo/server/api/grpc/octoserver"
 	"github.com/AndreyVLZ/curly-octo/server/pkg/jwt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 type fileStorager interface {
@@ -43,10 +45,13 @@ type GRPCServer struct {
 	store      storager
 }
 
-func NewGRPCServere(addr string, jwt *jwt.JWT, store storager, fileStore fileStorager, sendBufSize int) *GRPCServer {
+func NewGRPCServere(addr string, tlsConf *tls.Config, jwt *jwt.JWT, store storager, fileStore fileStorager, sendBufSize int) *GRPCServer {
+	tlsCred := credentials.NewTLS(tlsConf)
+
 	inter := interceptor.New(jwt)
 
 	opts := []grpc.ServerOption{
+		grpc.Creds(tlsCred),
 		grpc.UnaryInterceptor(inter.Unary()),
 		grpc.StreamInterceptor(inter.Stream()),
 	}

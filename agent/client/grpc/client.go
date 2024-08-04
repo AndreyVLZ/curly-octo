@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/AndreyVLZ/curly-octo/agent/service/syncservice"
 	"github.com/AndreyVLZ/curly-octo/internal/model"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 type iAuthClient interface {
@@ -37,12 +38,17 @@ type Client struct {
 	authConn    *grpc.ClientConn
 }
 
-func NewClient(addr string, storeSrv iStoreService, sendBufSize int) (*Client, error) {
+func NewClient(addr string, tlsConf *tls.Config, storeSrv iStoreService, sendBufSize int) (*Client, error) {
+	tlsCrend := credentials.NewTLS(tlsConf)
+
 	// опции для auth-клиента
-	authOpts := grpc.WithTransportCredentials(insecure.NewCredentials())
+	authOpts := []grpc.DialOption{
+		grpc.WithTransportCredentials(tlsCrend),
+		// grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
 
 	// соединение для auth-клиента
-	authConn, err := grpc.NewClient(addr, authOpts)
+	authConn, err := grpc.NewClient(addr, authOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("new grpc client: %w", err)
 	}
@@ -55,9 +61,10 @@ func NewClient(addr string, storeSrv iStoreService, sendBufSize int) (*Client, e
 
 	// опции для основного клиента
 	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(tlsCrend),
 		grpc.WithUnaryInterceptor(inter.Unary()),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStreamInterceptor(inter.Stream()),
+		// grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
 	conn, err := grpc.NewClient(addr, opts...)

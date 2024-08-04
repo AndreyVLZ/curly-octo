@@ -1,6 +1,7 @@
 # Binaries
 cmd/agent/agent
 cmd/server/server
+cmd/gencert/gencert
 
 # VIM temp files
 *.swp
