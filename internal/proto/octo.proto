@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package myproto;
+
+option go_package = "internal/proto";
+
+message Data {
+	enum type {
+		UnknownData = 0;
+		LogPassData = 1;
+		TextData = 2;
+		BinaryData = 3;
+		CardData = 4;
+	}
+ 	string id = 1;
+	string name = 2;
+	type rtype =3;
+	bytes meta = 4;
+	bytes data = 5;
+}
+
+message SendArrayRequest {
+	repeated Data arr = 1;
+}
+
+message SendArrayResponse {
+	string error =1;
+}
+
+message GetArrayRequest {}
+
+message GetArrayResponse {
+	repeated Data arr = 1;
+	string error =2;
+}
+
+// Стрим файла с агента [запрос].
+message FileRequest {
+	bytes data = 1;
+}
+
+// Стрим файла с агента [ответ].
+message FileResponse {
+	string error = 1; 
+}
+
+// Стрим файла с сервера [запрос].
+message FileStreamServerRequest {
+	string idFile = 1;
+}
+
+// Стрим файла с сервера [ответ].
+message FileStreamServerResponse {
+	bytes data = 1;
+}
+
+// Основной
+service Octo {
+	rpc SendArray(SendArrayRequest) returns (SendArrayResponse); 
+	rpc GetArray(GetArrayRequest) returns (GetArrayResponse); 
+	rpc StreamFile(stream FileRequest) returns (FileResponse){};
+	rpc ServerStreamFile(FileStreamServerRequest) returns (stream FileStreamServerResponse){};
+}
+
+// Вход [запрос]
+message LoginRequest {
+	string Name = 1;
+	string Password =2;
+}
+
+// Вход [ответ]
+message LoginResponce {
+	string Token = 1;
+}
+
+// Регистрация [запрос]
+message RegRequest {
+	string Name = 1;
+	string Password =2;
+}
+
+// Регистрация [ответ]
+message RegResponce {
+	string Token = 1;
+}
+
+// Auth
+service Auth {
+	rpc Login(LoginRequest) returns (LoginResponce);
+	rpc Registration(RegRequest) returns (RegResponce);
+}
